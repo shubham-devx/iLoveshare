@@ -60,11 +60,13 @@ export async function POST(request: NextRequest) {
     }
 
     const userAgent = request.headers.get('user-agent') || null;
+    const responseId = crypto.randomUUID();
 
-    // Insert response
+    // Insert response without .select() so anonymous receivers don't hit SELECT RLS
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: insertedResponse, error: insertError } = await (supabase.from('experience_responses') as any)
+    const { error: insertError } = await (supabase.from('experience_responses') as any)
       .insert({
+        id: responseId,
         experience_id: experience.id,
         response_type,
         response_value,
@@ -73,24 +75,26 @@ export async function POST(request: NextRequest) {
         written_feedback: written_feedback || null,
         ip_address: ip,
         user_agent: userAgent,
-      })
-      .select()
-      .single();
+      });
 
     if (insertError) {
+      console.error('Failed to insert experience_response:', insertError);
       return NextResponse.json({ error: 'Failed to record response' }, { status: 500 });
     }
 
     // Also record normalized feedback if rating or written feedback was provided
     if (star_rating || written_feedback) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (supabase.from('experience_feedback') as any).insert({
+      const { error: fbError } = await (supabase.from('experience_feedback') as any).insert({
         experience_id: experience.id,
-        response_id: insertedResponse?.id || null,
+        response_id: responseId,
         rating: star_rating || 5,
         comment: written_feedback || null,
         recipient_name: respondent_name || experience.recipient_name,
       });
+      if (fbError) {
+        console.error('Failed to insert experience_feedback:', fbError);
+      }
     }
 
     // Log analytics event
@@ -102,7 +106,7 @@ export async function POST(request: NextRequest) {
       user_agent: userAgent,
     });
 
-    return NextResponse.json({ success: true, response: insertedResponse });
+    return NextResponse.json({ success: true, id: responseId });
   } catch (error) {
     console.error('Response submission error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
