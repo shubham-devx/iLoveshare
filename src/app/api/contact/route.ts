@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { contactFormSchema } from '@/lib/validations';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { escapeHtml, sendBrevoEmail } from '@/lib/brevo';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,6 +26,25 @@ export async function POST(request: NextRequest) {
         { error: 'Please check your input', details: parsed.error.flatten() },
         { status: 400 }
       );
+    }
+
+    const { name, email, subject, message } = parsed.data;
+    const supportEmail = process.env.BREVO_SENDER_EMAIL;
+
+    if (supportEmail && process.env.BREVO_API_KEY && !process.env.BREVO_API_KEY.startsWith('your-')) {
+      await sendBrevoEmail({
+        to: [{ email: supportEmail, name: 'iLoveShare Support' }],
+        subject: `[iLoveShare Contact] ${subject}`,
+        htmlContent: `
+          <h3>New Contact Form Message</h3>
+          <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+          <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+          <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+          <p><strong>Message:</strong></p>
+          <p>${escapeHtml(message).replace(/\n/g, '<br />')}</p>
+        `,
+        replyTo: { email, name },
+      });
     }
 
     return NextResponse.json({

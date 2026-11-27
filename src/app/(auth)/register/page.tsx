@@ -93,7 +93,7 @@ export default function RegisterPage() {
     e.preventDefault();
     const cleaned = otp.replace(/\s+/g, '');
     if (cleaned.length < 6) {
-      toast.error('Please enter the 6-digit verification code.');
+      toast.error('Please enter the verification code from your email.');
       return;
     }
 
@@ -143,7 +143,7 @@ export default function RegisterPage() {
           Verify Your Email
         </h1>
         <p className="text-brand-muted text-sm mb-6">
-          We sent a 6-digit verification code to{' '}
+          We sent a verification code to{' '}
           <span className="font-semibold text-brand-text">{registeredEmail}</span>.
           Enter it below to activate your account.
         </p>
@@ -155,11 +155,11 @@ export default function RegisterPage() {
               type="text"
               inputMode="numeric"
               autoComplete="one-time-code"
-              maxLength={6}
+              maxLength={8}
               value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
-              placeholder="Enter 6-digit code"
-              className="w-full h-12 pl-10 pr-4 rounded-xl border border-brand-border bg-brand-surface text-brand-text placeholder:text-brand-muted text-center text-lg font-mono tracking-[0.35em] focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all"
+              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 8))}
+              placeholder="Enter verification code"
+              className="w-full h-12 pl-10 pr-4 rounded-xl border border-brand-border bg-brand-surface text-brand-text placeholder:text-brand-muted text-center text-lg font-mono tracking-[0.25em] focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all"
             />
           </div>
 
