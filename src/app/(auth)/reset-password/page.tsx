@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -26,11 +26,43 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
+  const [sessionError, setSessionError] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    let active = true;
+    const initSession = async () => {
+      const supabase = createClient();
+      const code = searchParams.get('code');
+
+      if (code) {
+        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (error && active) {
+          setSessionError(true);
+          return;
+        }
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!active) return;
+      if (user) {
+        setSessionReady(true);
+      } else {
+        setSessionError(true);
+      }
+    };
+
+    void initSession();
+    return () => {
+      active = false;
+    };
+  }, [searchParams]);
 
   const {
     register,
@@ -63,6 +95,30 @@ export default function ResetPasswordPage() {
         </div>
         <h1 className="font-serif text-3xl font-bold text-brand-text mb-3">Password Updated!</h1>
         <p className="text-brand-muted mb-6">Your password has been reset successfully. Redirecting to dashboard...</p>
+      </div>
+    );
+  }
+
+  if (sessionError) {
+    return (
+      <div className="animate-fade-in-up text-center">
+        <h1 className="font-serif text-3xl font-bold text-brand-text mb-3">Reset Link Expired</h1>
+        <p className="text-brand-muted mb-6">
+          This password reset link is invalid or has expired. Please request a new one.
+        </p>
+        <Link href="/forgot-password">
+          <Button className="w-full btn-primary" size="lg">
+            Request New Reset Link
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  if (!sessionReady) {
+    return (
+      <div className="animate-fade-in-up text-center py-8">
+        <p className="text-brand-muted">Verifying reset link...</p>
       </div>
     );
   }
@@ -114,5 +170,13 @@ export default function ResetPasswordPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-8 text-brand-muted">Loading...</div>}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
