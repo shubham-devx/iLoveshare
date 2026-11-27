@@ -65,13 +65,20 @@ export function Footer() {
               </a>
               {/* Email */}
               <a
-                href="mailto:hello@iloveshare.com"
+                href="mailto:mhn.technical.help7@gmail.com"
                 aria-label="Email"
                 className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center hover:bg-brand-primary transition-colors"
               >
                 <Mail className="w-4 h-4" />
               </a>
             </div>
+            <a
+              href="mailto:mhn.technical.help7@gmail.com"
+              className="mt-4 inline-flex items-center gap-2 text-xs text-white/60 hover:text-white transition-colors break-all"
+            >
+              <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+              mhn.technical.help7@gmail.com
+            </a>
           </div>
 
           {/* Links */}
@@ -99,14 +106,21 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/10">
-        <div className="container-custom py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="container-custom py-6 flex flex-col md:flex-row items-center justify-between gap-3 text-center md:text-left">
           <p className="text-white/40 text-sm">
             © {new Date().getFullYear()} {APP_NAME}. All rights reserved. Made with{' '}
             <Heart className="w-3 h-3 inline text-brand-primary fill-brand-primary" /> in India.
           </p>
-          <p className="text-white/40 text-xs">
-            Crafting digital memories, one surprise at a time.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-white/40 text-xs">
+            <a
+              href="mailto:mhn.technical.help7@gmail.com"
+              className="hover:text-white transition-colors break-all"
+            >
+              Contact: mhn.technical.help7@gmail.com
+            </a>
+            <span className="hidden sm:inline">•</span>
+            <span>Crafting digital memories, one surprise at a time.</span>
+          </div>
         </div>
       </div>
     </footer>

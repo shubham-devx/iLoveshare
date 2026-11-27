@@ -40,7 +40,8 @@ export default function ContactPage() {
     {
       icon: Mail,
       title: 'Email Us',
-      detail: 'hello@iloveshare.com',
+      detail: 'mhn.technical.help7@gmail.com',
+      href: 'mailto:mhn.technical.help7@gmail.com',
       sub: 'We reply within 24 hours',
       color: '#B85C75',
     },
@@ -48,6 +49,7 @@ export default function ContactPage() {
       icon: MessageCircle,
       title: 'Live Chat',
       detail: 'Available on the platform',
+      href: undefined,
       sub: 'Mon–Fri, 9am–6pm IST',
       color: '#D9A86C',
     },
@@ -55,6 +57,7 @@ export default function ContactPage() {
       icon: Clock,
       title: 'Response Time',
       detail: 'Within 24 hours',
+      href: undefined,
       sub: 'Usually much faster',
       color: '#E8A0AD',
     },
@@ -99,7 +102,16 @@ export default function ContactPage() {
                   <info.icon className="w-6 h-6" style={{ color: info.color }} />
                 </div>
                 <h3 className="font-semibold text-brand-text mb-1">{info.title}</h3>
-                <p className="text-brand-text font-medium text-sm mb-1">{info.detail}</p>
+                {info.href ? (
+                  <a
+                    href={info.href}
+                    className="text-brand-primary hover:underline font-medium text-sm mb-1 block break-all"
+                  >
+                    {info.detail}
+                  </a>
+                ) : (
+                  <p className="text-brand-text font-medium text-sm mb-1">{info.detail}</p>
+                )}
                 <p className="text-brand-muted text-xs">{info.sub}</p>
               </motion.div>
             ))}

@@ -1,8 +1,9 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Playfair_Display, DM_Sans, Cormorant_Garamond } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { Toaster } from 'sonner';
+import { InstallAppFloat } from '@/components/ui/install-app-float';
 import { APP_NAME, APP_DESCRIPTION } from '@/lib/constants';
 
 const playfair = Playfair_Display({
@@ -23,6 +24,13 @@ const cormorant = Cormorant_Garamond({
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: '#B85C75',
+};
 
 export const metadata: Metadata = {
   title: {
@@ -76,6 +84,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <InstallAppFloat />
           <Toaster position="top-right" richColors />
         </ThemeProvider>
       </body>

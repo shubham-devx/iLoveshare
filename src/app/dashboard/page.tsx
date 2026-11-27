@@ -5,6 +5,8 @@ import { DashboardOverview } from '@/components/dashboard/overview';
 import type { Metadata } from 'next';
 import type { Profile, Experience } from '@/types/database';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Dashboard',
   robots: { index: false, follow: false },

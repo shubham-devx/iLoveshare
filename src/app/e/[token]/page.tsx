@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { ExperienceViewer } from '@/components/experience/experience-viewer';
 import { isFutureDate } from '@/lib/utils';
 import type { Metadata } from 'next';
@@ -78,18 +78,24 @@ export default async function ExperiencePage({ params }: PageProps) {
 
   const attachments = (rawAttachments || []) as ExperienceAttachment[];
 
-  // Track the view (fire and forget) - use void to avoid unhandled promise
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  void (supabase.from('experience_analytics') as any).insert({
-    experience_id: experience.id,
-    event_type: 'view',
-  });
+  // Use admin client to bypass owner-only UPDATE RLS when anonymous receivers open the link
+  const writer = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? await createAdminClient()
+    : supabase;
 
-  // Increment view count
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  void (supabase.from('experiences') as any).update({
-    view_count: (experience.view_count || 0) + 1,
-  }).eq('id', experience.id);
+  await Promise.allSettled([
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (writer.from('experience_analytics') as any).insert({
+      experience_id: experience.id,
+      event_type: 'view',
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (writer.from('experiences') as any)
+      .update({
+        view_count: (experience.view_count || 0) + 1,
+      })
+      .eq('id', experience.id),
+  ]);
 
   const isScheduledFuture = isFutureDate(experience.scheduled_at);
 

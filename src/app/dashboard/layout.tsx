@@ -27,7 +27,7 @@ export default async function DashboardLayout({
       <DashboardNavigation user={profile} />
       <div className="flex pt-16">
         <DashboardSidebar />
-        <main className="flex-1 md:ml-64 p-6 lg:p-8 min-h-[calc(100vh-4rem)]">
+        <main className="flex-1 min-w-0 md:ml-64 p-4 sm:p-6 lg:p-8 pb-24 md:pb-8 min-h-[calc(100vh-4rem)]">
           {children}
         </main>
       </div>

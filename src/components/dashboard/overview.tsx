@@ -30,7 +30,7 @@ const statCards = (stats: DashboardOverviewProps['stats']) => [
   },
   {
     icon: Eye,
-    label: 'Links Opened',
+    label: 'Total Views',
     value: stats.totalViews,
     color: '#D9A86C',
     bg: '#D9A86C15',
@@ -82,23 +82,23 @@ export function DashboardOverview({
       </motion.div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         {statCards(stats).map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-5 rounded-2xl border border-brand-border bg-brand-surface"
+            className="p-4 sm:p-5 rounded-2xl border border-brand-border bg-brand-surface"
           >
             <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center mb-3"
               style={{ backgroundColor: stat.bg }}
             >
-              <stat.icon className="w-5 h-5" style={{ color: stat.color }} />
+              <stat.icon className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: stat.color }} />
             </div>
-            <div className="font-serif text-2xl font-bold text-brand-text">{stat.value}</div>
-            <div className="text-sm text-brand-muted mt-0.5">{stat.label}</div>
+            <div className="font-serif text-xl sm:text-2xl font-bold text-brand-text">{stat.value}</div>
+            <div className="text-xs sm:text-sm text-brand-muted mt-0.5">{stat.label}</div>
           </motion.div>
         ))}
       </div>
