@@ -12,18 +12,20 @@ const plans = [
     name: 'Free',
     price: '₹0',
     period: 'forever',
-    description: 'Perfect for getting started',
+    description: 'Available now — start creating for free',
     features: [
-      '3 experiences per month',
-      'Basic themes (3)',
-      'Up to 2 photos per experience',
-      'Unique sharing link',
-      'Basic animations',
-      'Response collection',
+      'Personalized digital experiences',
+      'All 9 curated themes',
+      'Up to 4 photos per experience',
+      'PDF & audio attachments',
+      'Unique sharing link & QR code',
+      'Animations, cake & scratch card',
+      'Response & feedback collection',
     ],
     cta: 'Get Started Free',
     href: ROUTES.REGISTER,
     highlight: false,
+    comingSoon: false,
   },
   {
     name: 'Premium',
@@ -31,22 +33,18 @@ const plans = [
     period: 'per month',
     description: 'For heartfelt creators',
     features: [
-      'Unlimited experiences',
-      'All 9 premium themes',
-      'Up to 4 photos per experience',
-      'PDF & audio attachments',
-      'All animations + music',
-      'QR code generation',
-      'Scheduled delivery',
-      'Expiry dates',
-      'Analytics dashboard',
-      'Response history',
+      'Everything in Free',
+      'Automated scheduled email delivery',
+      'Priority media storage',
+      'Advanced response analytics',
+      'Custom experience expiry rules',
       'Priority support',
     ],
-    cta: 'Start Premium',
+    cta: 'Coming Soon',
     href: ROUTES.REGISTER,
     highlight: true,
-    badge: 'Most Popular',
+    badge: 'Coming Soon',
+    comingSoon: true,
   },
   {
     name: 'Business',
@@ -60,12 +58,13 @@ const plans = [
       'Team collaboration',
       'API access',
       'Dedicated account manager',
-      'Custom integrations',
       'White-label option',
     ],
-    cta: 'Contact Sales',
+    cta: 'Coming Soon',
     href: ROUTES.CONTACT,
     highlight: false,
+    badge: 'Coming Soon',
+    comingSoon: true,
   },
 ];
 
@@ -115,16 +114,27 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <Link
-                href={plan.href}
-                className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all ${
-                  plan.highlight
-                    ? 'bg-brand-primary text-white hover:bg-brand-primary/90 shadow-soft'
-                    : 'border border-brand-border text-brand-text hover:border-brand-primary hover:text-brand-primary'
-                }`}
-              >
-                {plan.cta}
-              </Link>
+              {plan.comingSoon ? (
+                <button
+                  type="button"
+                  disabled
+                  aria-disabled="true"
+                  className="block w-full text-center py-3 rounded-xl font-semibold text-sm bg-brand-border/40 text-brand-muted cursor-not-allowed"
+                >
+                  {plan.cta}
+                </button>
+              ) : (
+                <Link
+                  href={plan.href}
+                  className={`block w-full text-center py-3 rounded-xl font-semibold text-sm transition-all ${
+                    plan.highlight
+                      ? 'bg-brand-primary text-white hover:bg-brand-primary/90 shadow-soft'
+                      : 'border border-brand-border text-brand-text hover:border-brand-primary hover:text-brand-primary'
+                  }`}
+                >
+                  {plan.cta}
+                </Link>
+              )}
             </div>
           ))}
         </div>

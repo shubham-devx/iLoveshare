@@ -77,13 +77,43 @@ export function StepDelivery({ data, onChange, onPublish, isSubmitting }: StepDe
             </button>
           </div>
           {showSchedule && (
-            <input
-              type="datetime-local"
-              value={data.scheduledAt}
-              onChange={(e) => onChange({ scheduledAt: e.target.value })}
-              className="w-full h-10 px-3 rounded-lg border border-brand-border bg-brand-surface text-brand-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
-            />
+            <div className="space-y-2">
+              <input
+                type="datetime-local"
+                value={data.scheduledAt}
+                onChange={(e) => onChange({ scheduledAt: e.target.value })}
+                className="w-full h-10 px-3 rounded-lg border border-brand-border bg-brand-surface text-brand-text text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              />
+              <p className="text-xs text-brand-muted">
+                Note: Scheduled surprises are saved as drafts. Automated email delivery is <span className="font-semibold text-brand-primary">Coming Soon</span>.
+              </p>
+            </div>
           )}
+        </div>
+
+        {/* Group celebration delivery - Coming Soon */}
+        <div className="p-4 rounded-xl border border-brand-border bg-brand-background/60 opacity-75">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 text-sm font-medium text-brand-text">
+                <span>👥 Group Celebration Delivery</span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-primary/15 text-brand-primary">
+                  Coming Soon
+                </span>
+              </div>
+              <p className="text-xs text-brand-muted mt-0.5">
+                Send individual personalized links to multiple recipients at once.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="w-11 h-6 rounded-full bg-brand-border relative cursor-not-allowed flex-shrink-0"
+            >
+              <div className="w-5 h-5 rounded-full bg-white/80 absolute top-0.5 translate-x-0.5 shadow-sm" />
+            </button>
+          </div>
         </div>
 
         {/* Expiry date */}

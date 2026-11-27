@@ -16,9 +16,9 @@ const floatingElements = [
 ];
 
 const stats = [
-  { label: 'Surprises Created', value: '50K+' },
-  { label: 'Happy Recipients', value: '48K+' },
-  { label: 'Countries Reached', value: '32+' },
+  { label: 'Curated Themes', value: '9' },
+  { label: 'Experience Types', value: '12' },
+  { label: 'Private & Ad-Free', value: '100%' },
 ];
 
 export function HeroSection() {

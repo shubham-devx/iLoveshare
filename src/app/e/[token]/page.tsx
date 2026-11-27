@@ -93,9 +93,15 @@ export default async function ExperiencePage({ params }: PageProps) {
 
   const isScheduledFuture = isFutureDate(experience.scheduled_at);
 
+  // Never send the bcrypt passcode hash to the client
+  const safeExperience: Experience = {
+    ...experience,
+    passcode: experience.passcode ? '__protected__' : null,
+  };
+
   return (
     <ExperienceViewer
-      experience={experience}
+      experience={safeExperience}
       attachments={attachments}
       initiallyScheduledFuture={isScheduledFuture}
     />

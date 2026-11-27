@@ -60,13 +60,13 @@ export function TestimonialsSection() {
           className="text-center mb-16"
         >
           <span className="text-brand-primary text-sm font-medium uppercase tracking-widest">
-            Testimonials
+            Celebration Stories
           </span>
           <h2 className="font-serif text-4xl md:text-5xl font-bold text-brand-text mt-3 mb-4">
             Stories of Unforgettable Moments
           </h2>
           <p className="text-brand-muted text-lg max-w-2xl mx-auto">
-            Thousands of people have created memories with iLoveShare. Here are a few of their stories.
+            See how people use iLoveShare to turn birthdays, proposals, and milestones into lasting memories.
           </p>
         </motion.div>
 

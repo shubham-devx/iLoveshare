@@ -28,7 +28,7 @@ export function CTASection() {
             <span className="text-gradient">Unforgettable?</span>
           </h2>
           <p className="text-white/60 text-xl max-w-2xl mx-auto mb-10">
-            Join thousands who have already created magical moments with iLoveShare. Your next beautiful surprise is just minutes away.
+            Create magical, personalized digital moments with iLoveShare. Your next unforgettable surprise is just minutes away.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href={ROUTES.REGISTER}>

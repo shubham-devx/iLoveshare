@@ -1,11 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Lock, Unlock } from 'lucide-react';
+import { Lock, Unlock, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface PasscodeGateProps {
-  expectedPasscode: string;
+  /** The public token of the experience — used to identify it server-side.
+   *  The bcrypt hash itself is NEVER sent to the browser. */
+  experienceToken: string;
   recipientName: string;
   senderName: string;
   onUnlock: () => void;
@@ -13,7 +15,7 @@ interface PasscodeGateProps {
 }
 
 export function PasscodeGate({
-  expectedPasscode,
+  experienceToken,
   recipientName,
   senderName,
   onUnlock,
@@ -21,14 +23,33 @@ export function PasscodeGate({
 }: PasscodeGateProps) {
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() === expectedPasscode.trim()) {
-      setError('');
-      onUnlock();
-    } else {
-      setError('Incorrect secret code. Please try again.');
+    if (!input.trim()) return;
+
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/passcode/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: experienceToken, passcode: input.trim() }),
+      });
+      const json = await res.json() as { success?: boolean; error?: string };
+
+      if (json.success) {
+        onUnlock();
+      } else {
+        setError(json.error || 'Incorrect secret code. Please try again.');
+        setInput('');
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,7 +73,8 @@ export function PasscodeGate({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Enter secret passcode..."
-            className="w-full h-12 px-4 rounded-xl border border-brand-border bg-white text-brand-text text-center text-base focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            disabled={loading}
+            className="w-full h-12 px-4 rounded-xl border border-brand-border bg-white text-brand-text text-center text-base focus:outline-none focus:ring-2 focus:ring-brand-primary disabled:opacity-50"
           />
           {error && <p className="text-xs text-red-500">{error}</p>}
           <Button
@@ -60,9 +82,14 @@ export function PasscodeGate({
             className="w-full text-white"
             style={{ backgroundColor: accentColor }}
             size="lg"
+            disabled={loading || !input.trim()}
           >
-            <Unlock className="w-4 h-4 mr-2" />
-            Unlock Surprise
+            {loading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Unlock className="w-4 h-4 mr-2" />
+            )}
+            {loading ? 'Checking...' : 'Unlock Surprise'}
           </Button>
         </form>
       </div>

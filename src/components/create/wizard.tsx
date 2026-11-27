@@ -6,6 +6,7 @@ import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn, generateToken } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
+import bcrypt from 'bcryptjs';
 import { StepRecipientType } from './steps/step-recipient-type';
 import { StepExperienceType } from './steps/step-experience-type';
 import { StepRecipientInfo } from './steps/step-recipient-info';
@@ -128,37 +129,46 @@ export function ExperienceWizard({ userId, initialType, draftId, initialExperien
     if (currentStep > 1) setCurrentStep((s) => s - 1);
   };
 
-  const buildPayload = (status: 'draft' | 'published', token: string, title: string) => ({
-    user_id: userId,
-    title,
-    type: data.experienceType || 'custom',
-    recipient_type: data.recipientType || 'other',
-    recipient_name: data.recipientName || 'Recipient',
-    sender_name: data.senderName || 'Sender',
-    relationship: data.relationship || null,
-    personal_greeting: data.personalGreeting || null,
-    message: data.message || null,
-    theme: data.theme,
-    animations: data.animations,
-    music_enabled: data.musicEnabled,
-    music_url: data.musicUrl || null,
-    response_type: data.responseType,
-    custom_response_label: data.customResponseLabel || null,
-    enable_star_rating: data.enableStarRating,
-    enable_written_feedback: data.enableWrittenFeedback,
-    passcode: data.passcode || null,
-    language: data.language,
-    scratch_message: data.scratchMessage || null,
-    event_details: data.eventDetails,
-    milestones: data.milestones,
-    group_delivery: data.groupDelivery,
-    lock_after_response: data.lockAfterResponse,
-    token,
-    status,
-    scheduled_at: data.scheduledAt || null,
-    expires_at: data.expiresAt || null,
-    published_at: status === 'published' && !data.scheduledAt ? new Date().toISOString() : null,
-  });
+  const buildPayload = async (status: 'draft' | 'published', token: string, title: string) => {
+    // Hash the passcode with bcrypt before saving — plain text never reaches the DB
+    let hashedPasscode: string | null = null;
+    if (data.passcode) {
+      const isAlreadyHashed = /^\$2[aby]\$\d{2}\$.{53}$/.test(data.passcode);
+      hashedPasscode = isAlreadyHashed ? data.passcode : await bcrypt.hash(data.passcode, 10);
+    }
+
+    return {
+      user_id: userId,
+      title,
+      type: data.experienceType || 'custom',
+      recipient_type: data.recipientType || 'other',
+      recipient_name: data.recipientName || 'Recipient',
+      sender_name: data.senderName || 'Sender',
+      relationship: data.relationship || null,
+      personal_greeting: data.personalGreeting || null,
+      message: data.message || null,
+      theme: data.theme,
+      animations: data.animations,
+      music_enabled: data.musicEnabled,
+      music_url: data.musicUrl || null,
+      response_type: data.responseType,
+      custom_response_label: data.customResponseLabel || null,
+      enable_star_rating: data.enableStarRating,
+      enable_written_feedback: data.enableWrittenFeedback,
+      passcode: hashedPasscode,
+      language: data.language,
+      scratch_message: data.scratchMessage || null,
+      event_details: data.eventDetails,
+      milestones: data.milestones,
+      group_delivery: data.groupDelivery,
+      lock_after_response: data.lockAfterResponse,
+      token,
+      status,
+      scheduled_at: data.scheduledAt || null,
+      expires_at: data.expiresAt || null,
+      published_at: status === 'published' && !data.scheduledAt ? new Date().toISOString() : null,
+    };
+  };
 
   const handleSaveDraft = async () => {
     const supabase = createClient();
@@ -167,7 +177,7 @@ export function ExperienceWizard({ userId, initialType, draftId, initialExperien
       ? `${data.experienceType.replace(/_/g, ' ')} for ${data.recipientName}`
       : 'Untitled Surprise';
 
-    const payload = buildPayload('draft', token, title);
+    const payload = await buildPayload('draft', token, title);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const table = supabase.from('experiences') as any;
@@ -189,7 +199,7 @@ export function ExperienceWizard({ userId, initialType, draftId, initialExperien
     const token = initialExperience?.token || generateToken(32);
     const title = `${data.experienceType.replace(/_/g, ' ')} for ${data.recipientName}`;
     const targetStatus: 'draft' | 'published' = data.scheduledAt ? 'draft' : 'published';
-    const payload = buildPayload(targetStatus, token, title);
+    const payload = await buildPayload(targetStatus, token, title);
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

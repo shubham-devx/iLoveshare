@@ -157,7 +157,7 @@ export function ExperienceViewer({
     return (
       <div className={`min-h-screen bg-gradient-to-br ${theme.bg}`} style={{ color: theme.textColor }}>
         <PasscodeGate
-          expectedPasscode={experience.passcode}
+          experienceToken={experience.token}
           recipientName={experience.recipient_name}
           senderName={experience.sender_name}
           onUnlock={() => setPasscodeUnlocked(true)}
