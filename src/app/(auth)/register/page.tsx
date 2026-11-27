@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Mail, Lock, User, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Sparkles, KeyRound, RefreshCw } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/lib/constants';
@@ -33,7 +33,20 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const {
     register,
@@ -46,7 +59,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     const supabase = createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { data: authData, error } = await supabase.auth.signUp({
       email: data.email,
       password: data.password,
       options: {
@@ -62,31 +75,133 @@ export default function RegisterPage() {
       return;
     }
 
+    // If email confirmation is disabled in Supabase, session is active immediately
+    if (authData.session) {
+      toast.success('Account created! Welcome to iLoveShare 🎉');
+      router.push(ROUTES.DASHBOARD);
+      router.refresh();
+      return;
+    }
+
+    setRegisteredEmail(data.email);
     setEmailSent(true);
-    toast.success('Account created! Please check your email to verify.');
+    setResendCooldown(60);
+    toast.success('Verification code sent! Please check your email.');
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleaned = otp.replace(/\s+/g, '');
+    if (cleaned.length < 6) {
+      toast.error('Please enter the 6-digit verification code.');
+      return;
+    }
+
+    setIsVerifying(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({
+      email: registeredEmail,
+      token: cleaned,
+      type: 'signup',
+    });
+    setIsVerifying(false);
+
+    if (error) {
+      toast.error(error.message || 'Invalid or expired code. Please try again.');
+      return;
+    }
+
+    toast.success('Email verified! Welcome to iLoveShare 🎉');
+    router.push(ROUTES.DASHBOARD);
+    router.refresh();
+  };
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0 || !registeredEmail) return;
+    setIsResending(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: registeredEmail,
+    });
+    setIsResending(false);
+
+    if (error) {
+      toast.error(error.message || 'Failed to resend code. Please wait a moment.');
+      return;
+    }
+
+    setResendCooldown(60);
+    toast.success('A new 6-digit verification code has been sent!');
   };
 
   if (emailSent) {
     return (
       <div className="animate-fade-in-up text-center">
-        <div className="text-6xl mb-6">📬</div>
-        <h1 className="font-serif text-3xl font-bold text-brand-text mb-3">
-          Check Your Email
+        <div className="text-5xl mb-4">📬</div>
+        <h1 className="font-serif text-3xl font-bold text-brand-text mb-2">
+          Verify Your Email
         </h1>
-        <p className="text-brand-muted mb-6">
-          We&apos;ve sent a verification link to your email address. Click the link to activate your account and start creating beautiful surprises.
+        <p className="text-brand-muted text-sm mb-6">
+          We sent a 6-digit verification code to{' '}
+          <span className="font-semibold text-brand-text">{registeredEmail}</span>.
+          Enter it below to activate your account.
         </p>
-        <div className="p-4 rounded-xl bg-brand-primary/5 border border-brand-primary/20 mb-6">
-          <p className="text-sm text-brand-muted">
-            Didn&apos;t receive it? Check your spam folder or{' '}
-            <button
-              onClick={() => setEmailSent(false)}
-              className="text-brand-primary hover:underline"
-            >
-              try again
-            </button>.
+
+        <form onSubmit={handleVerifyOtp} className="space-y-4 text-left mb-6">
+          <div className="relative">
+            <KeyRound className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-muted" />
+            <input
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              value={otp}
+              onChange={(e) => setOtp(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+              placeholder="Enter 6-digit code"
+              className="w-full h-12 pl-10 pr-4 rounded-xl border border-brand-border bg-brand-surface text-brand-text placeholder:text-brand-muted text-center text-lg font-mono tracking-[0.35em] focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent transition-all"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full btn-primary"
+            size="lg"
+            loading={isVerifying}
+            disabled={otp.length < 6}
+          >
+            Verify &amp; Continue
+          </Button>
+        </form>
+
+        <div className="p-4 rounded-xl bg-brand-primary/5 border border-brand-primary/20 mb-5 space-y-2">
+          <p className="text-xs text-brand-muted">
+            Didn&apos;t receive the code? Check your spam folder or resend it.
           </p>
+          <div className="flex items-center justify-center gap-4 text-xs">
+            <button
+              type="button"
+              onClick={handleResendCode}
+              disabled={resendCooldown > 0 || isResending}
+              className="inline-flex items-center gap-1 text-brand-primary font-medium hover:underline disabled:opacity-50 disabled:no-underline"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isResending ? 'animate-spin' : ''}`} />
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
+            </button>
+            <span className="text-brand-border">|</span>
+            <button
+              type="button"
+              onClick={() => {
+                setEmailSent(false);
+                setOtp('');
+              }}
+              className="text-brand-muted hover:text-brand-text hover:underline"
+            >
+              Use another email
+            </button>
+          </div>
         </div>
+
         <Link
           href={ROUTES.LOGIN}
           className="text-sm text-brand-primary hover:underline"
