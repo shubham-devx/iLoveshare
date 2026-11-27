@@ -18,6 +18,7 @@ export function StepAttachments({ data, onChange }: { data: WizardData; onChange
 
   const addFiles = (newFiles: File[], type: 'photo' | 'pdf' | 'audio') => {
     const errs: string[] = [];
+    let acceptedCount = 0;
 
     const validated = newFiles.filter((file) => {
       if (type === 'photo') {
@@ -29,10 +30,11 @@ export function StepAttachments({ data, onChange }: { data: WizardData; onChange
           errs.push(`${file.name}: Photo must be under ${MAX_PHOTO_SIZE_MB}MB.`);
           return false;
         }
-        if (photos.length + validated.length >= MAX_PHOTOS) {
+        if (photos.length + acceptedCount >= MAX_PHOTOS) {
           errs.push(`Maximum ${MAX_PHOTOS} photos allowed.`);
           return false;
         }
+        acceptedCount++;
       }
       if (type === 'pdf') {
         if (!ALLOWED_PDF_TYPES.includes(file.type as typeof ALLOWED_PDF_TYPES[number])) {
