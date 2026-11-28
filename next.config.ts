@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isProd = process.env.NODE_ENV === "production";
+
 const nextConfig: NextConfig = {
   // ── Image optimisation ──────────────────────────────────────────────────
   images: {
@@ -12,7 +14,7 @@ const nextConfig: NextConfig = {
   // ── Compiler options ────────────────────────────────────────────────────
   compiler: {
     // Remove console.log in production (keep warn/error)
-    removeConsole: { exclude: ["warn", "error"] },
+    removeConsole: isProd ? { exclude: ["warn", "error"] } : false,
   },
 
   // ── Experimental ────────────────────────────────────────────────────────
@@ -44,11 +46,15 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // ── HTTP headers ────────────────────────────────────────────────────────
+  // ── HTTP headers (production only) ─────────────────────────────────────
+  // In dev, Next.js/Turbopack chunks do NOT have content-hash names,
+  // so aggressive caching breaks HMR. Apply only in production where
+  // chunk filenames contain a content hash and are truly immutable.
   async headers() {
+    if (!isProd) return [];
     return [
       {
-        // Cache static assets aggressively (hashed filenames, safe forever)
+        // Static chunks in production have content-hash filenames — safe to cache forever
         source: "/_next/static/:path*",
         headers: [
           {
