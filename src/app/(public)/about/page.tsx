@@ -5,6 +5,9 @@ export const metadata: Metadata = {
   description: 'Learn about iLoveShare and our mission to make every feeling beautiful.',
 };
 
+// Statically generated — revalidate every 24 hours
+export const revalidate = 86400;
+
 export default function AboutPage() {
   return (
     <main className="pt-24 pb-24 bg-brand-background">

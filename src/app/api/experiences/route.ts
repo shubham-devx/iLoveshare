@@ -31,7 +31,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ experiences: data as Experience[] });
+  const response = NextResponse.json({ experiences: data as Experience[] });
+  // Private, short-lived cache: browser can reuse for 30s, CDN must not cache (authenticated route)
+  response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=10');
+  return response;
 }
 
 // DELETE /api/experiences - delete an experience

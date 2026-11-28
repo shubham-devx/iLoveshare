@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server';
+import { createClient, getCachedUser, getCachedProfile } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { ROUTES } from '@/lib/constants';
 import { DashboardOverview } from '@/components/dashboard/overview';
 import type { Metadata } from 'next';
-import type { Profile, Experience } from '@/types/database';
+import type { Experience } from '@/types/database';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,13 +13,14 @@ export const metadata: Metadata = {
 };
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   if (!user) redirect(ROUTES.LOGIN);
 
-  const [profileResult, allExperiencesResult] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', user.id).single(),
+  const supabase = await createClient();
+
+  const [profile, allExperiencesResult] = await Promise.all([
+    getCachedProfile(user.id),
     supabase
       .from('experiences')
       .select('*')
@@ -27,8 +28,6 @@ export default async function DashboardPage() {
       .eq('is_deleted', false)
       .order('created_at', { ascending: false }),
   ]);
-
-  const profile = profileResult.data as Profile | null;
   const allExperiences = (allExperiencesResult.data || []) as Experience[];
   const recentExperiences = allExperiences.slice(0, 5);
   const totalExperiences = allExperiences.length;

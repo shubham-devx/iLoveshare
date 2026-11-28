@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: 'Browse all types of personalized digital experiences you can create on iLoveShare.',
 };
 
+// Statically generated — revalidate every 24 hours
+export const revalidate = 86400;
+
 export default function ExplorePage() {
   return (
     <main className="pt-24 pb-24 bg-brand-background">

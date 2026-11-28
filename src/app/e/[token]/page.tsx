@@ -69,7 +69,7 @@ export default async function ExperiencePage({ params }: PageProps) {
     );
   }
 
-  // Fetch attachments
+  // Fetch attachments (now we have the id)
   const { data: rawAttachments } = await supabase
     .from('experience_attachments')
     .select('*')
@@ -78,12 +78,13 @@ export default async function ExperiencePage({ params }: PageProps) {
 
   const attachments = (rawAttachments || []) as ExperienceAttachment[];
 
-  // Use admin client to bypass owner-only UPDATE RLS when anonymous receivers open the link
+  // ── Fire-and-forget analytics + view count ──────────────────────────────
+  // Do NOT await — the page renders immediately while this runs in background
   const writer = process.env.SUPABASE_SERVICE_ROLE_KEY
     ? await createAdminClient()
     : supabase;
 
-  await Promise.allSettled([
+  Promise.allSettled([
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (writer.from('experience_analytics') as any).insert({
       experience_id: experience.id,
@@ -95,7 +96,7 @@ export default async function ExperiencePage({ params }: PageProps) {
         view_count: (experience.view_count || 0) + 1,
       })
       .eq('id', experience.id),
-  ]);
+  ]).catch(() => {/* best-effort — never block page load */});
 
   const isScheduledFuture = isFutureDate(experience.scheduled_at);
 

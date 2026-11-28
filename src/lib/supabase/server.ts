@@ -1,6 +1,7 @@
+import { cache } from 'react';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import type { Database } from '@/types/database';
+import type { Database, Profile } from '@/types/database';
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -26,6 +27,29 @@ export async function createClient() {
     }
   );
 }
+
+/**
+ * Deduplicated per-request auth user lookup so layout + page don't hit
+ * Supabase Auth twice in the same render pass.
+ */
+export const getCachedUser = cache(async () => {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+});
+
+/**
+ * Deduplicated per-request profile lookup so layout + page share one query.
+ */
+export const getCachedProfile = cache(async (userId: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', userId)
+    .single();
+  return data as Profile | null;
+});
 
 export async function createAdminClient() {
   const cookieStore = await cookies();

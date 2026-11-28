@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: 'Choose the perfect plan for your celebration needs.',
 };
 
+// Statically generated — revalidate every 24 hours
+export const revalidate = 86400;
+
 const plans = [
   {
     name: 'Free',
