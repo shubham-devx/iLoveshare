@@ -1,5 +1,3 @@
-import { Navigation } from '@/components/layout/navigation';
-import { Footer } from '@/components/layout/footer';
 import { HowItWorksSection } from '@/components/home/how-it-works';
 import type { Metadata } from 'next';
 
@@ -13,12 +11,8 @@ export const revalidate = 86400;
 
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen bg-brand-background">
-      <Navigation />
-      <div className="pt-24">
-        <HowItWorksSection />
-      </div>
-      <Footer />
+    <main className="min-h-screen bg-brand-background pt-24">
+      <HowItWorksSection />
     </main>
   );
 }

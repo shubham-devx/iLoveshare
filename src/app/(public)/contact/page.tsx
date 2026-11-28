@@ -1,8 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Navigation } from '@/components/layout/navigation';
-import { Footer } from '@/components/layout/footer';
 import { motion } from 'framer-motion';
 import { Mail, Send, MessageCircle, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -65,7 +63,6 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen bg-brand-background">
-      <Navigation />
       <div className="pt-28 pb-20">
         <div className="container-custom max-w-6xl">
           {/* Header */}
@@ -195,7 +192,6 @@ export default function ContactPage() {
           </motion.div>
         </div>
       </div>
-      <Footer />
     </main>
   );
 }

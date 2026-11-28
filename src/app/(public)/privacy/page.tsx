@@ -1,5 +1,3 @@
-import { Navigation } from '@/components/layout/navigation';
-import { Footer } from '@/components/layout/footer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -10,7 +8,6 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main className="min-h-screen bg-brand-background">
-      <Navigation />
       <div className="pt-28 pb-20">
         <div className="container-custom max-w-3xl">
           <div className="bg-brand-surface rounded-3xl p-8 md:p-12 border border-brand-border shadow-soft">
@@ -70,7 +67,6 @@ export default function PrivacyPage() {
           </div>
         </div>
       </div>
-      <Footer />
     </main>
   );
 }
