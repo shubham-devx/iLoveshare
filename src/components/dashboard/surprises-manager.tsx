@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Eye, Edit, Copy, Share2, Trash2, Archive, BarChart3,
@@ -34,6 +35,7 @@ const experienceEmojis: Record<string, string> = {
 };
 
 export function SurprisesManager({ experiences: initialExperiences, userId, newlyPublishedToken }: Props) {
+  const router = useRouter();
   const [experiences, setExperiences] = useState(initialExperiences);
   const [filter, setFilter] = useState<'all' | 'published' | 'draft' | 'archived'>('all');
   const [deleteModal, setDeleteModal] = useState<{ open: boolean; experience: Experience | null }>({
@@ -119,6 +121,7 @@ export function SurprisesManager({ experiences: initialExperiences, userId, newl
         setExperiences((prev) => prev.filter((e) => e.id !== deleteModal.experience!.id));
         toast.success('Surprise deleted successfully.');
         setDeleteModal({ open: false, experience: null });
+        router.refresh();
       }
     } catch {
       toast.error('Network error. Please try again.');

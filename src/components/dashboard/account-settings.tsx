@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Lock, Trash2, AlertTriangle, Eye, EyeOff } from 'lucide-react';
+import { Lock, Trash2, AlertTriangle, Eye, EyeOff, LogOut } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -25,6 +25,16 @@ export function AccountSettings({ userId, userEmail }: Props) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    toast.success('Signed out successfully.');
+    router.push(ROUTES.HOME);
+    router.refresh();
+  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,6 +136,33 @@ export function AccountSettings({ userId, userEmail }: Props) {
             Update Password
           </Button>
         </form>
+      </motion.div>
+
+      {/* Session / Sign Out */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="bg-brand-surface rounded-2xl border border-brand-border p-6 shadow-soft flex items-center justify-between gap-4 flex-wrap"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-brand-primary/10 flex items-center justify-center">
+            <LogOut className="w-5 h-5 text-brand-primary" />
+          </div>
+          <div>
+            <h2 className="font-semibold text-brand-text">Sign Out</h2>
+            <p className="text-brand-muted text-xs">Signed in as {userEmail}</p>
+          </div>
+        </div>
+        <Button
+          variant="outline"
+          loading={isSigningOut}
+          onClick={handleSignOut}
+          className="border-brand-border text-brand-text hover:border-red-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Log Out
+        </Button>
       </motion.div>
 
       {/* Danger Zone */}

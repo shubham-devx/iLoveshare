@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { FileText, Edit, Trash2, Calendar } from 'lucide-react';
 import type { Experience } from '@/types/database';
 import { Button } from '@/components/ui/button';
-import { formatDate, getExperienceShareUrl } from '@/lib/utils';
+import { formatDate } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
-import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   drafts: Experience[];
@@ -22,22 +22,23 @@ const experienceEmojis: Record<string, string> = {
   engagement: '💎', congratulations: '🏆', thank_you: '🙏', custom: '✨',
 };
 
-export function DraftsManager({ drafts: initialDrafts, userId }: Props) {
+export function DraftsManager({ drafts: initialDrafts }: Props) {
+  const router = useRouter();
   const [drafts, setDrafts] = useState(initialDrafts);
 
   const handleDelete = async (id: string) => {
-    const supabase = createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('experiences') as any)
-      .update({ is_deleted: true, deleted_at: new Date().toISOString(), status: 'deleted' })
-      .eq('id', id)
-      .eq('user_id', userId);
-
-    if (!error) {
-      setDrafts(prev => prev.filter(d => d.id !== id));
-      toast.success('Draft deleted.');
-    } else {
-      toast.error('Failed to delete draft.');
+    try {
+      const res = await fetch(`/api/experiences/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setDrafts(prev => prev.filter(d => d.id !== id));
+        toast.success('Draft deleted.');
+        router.refresh();
+      } else {
+        toast.error(data.error || 'Failed to delete draft.');
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
     }
   };
 

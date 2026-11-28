@@ -91,9 +91,11 @@ export async function DELETE(
 
   // Use admin client to bypass RLS for the soft-delete update
   // so it works regardless of which CHECK or policy constraints are in place
-  const admin = await createAdminClient();
+  const writer = process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? await createAdminClient()
+    : supabase;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (admin.from('experiences') as any)
+  const { error } = await (writer.from('experiences') as any)
     .update({
       is_deleted: true,
       deleted_at: new Date().toISOString(),
