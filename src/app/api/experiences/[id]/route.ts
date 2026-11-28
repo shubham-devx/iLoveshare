@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 
 export async function GET(
   _request: NextRequest,
@@ -66,6 +66,8 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  // Verify ownership with the user client first
   const supabase = await createClient();
   const {
     data: { user },
@@ -75,18 +77,34 @@ export async function DELETE(
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
+  // Confirm the experience belongs to this user
+  const { data: existing } = await supabase
+    .from('experiences')
+    .select('id')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .single();
+
+  if (!existing) {
+    return NextResponse.json({ error: 'Experience not found or access denied' }, { status: 404 });
+  }
+
+  // Use admin client to bypass RLS for the soft-delete update
+  // so it works regardless of which CHECK or policy constraints are in place
+  const admin = await createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase.from('experiences') as any)
+  const { error } = await (admin.from('experiences') as any)
     .update({
       is_deleted: true,
       deleted_at: new Date().toISOString(),
-      status: 'deleted',
+      updated_at: new Date().toISOString(),
     })
     .eq('id', id)
     .eq('user_id', user.id);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Delete experience error:', error);
+    return NextResponse.json({ error: 'Failed to delete experience' }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

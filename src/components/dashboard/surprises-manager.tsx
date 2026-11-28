@@ -108,21 +108,23 @@ export function SurprisesManager({ experiences: initialExperiences, userId, newl
     if (!deleteModal.experience) return;
     setIsDeleting(true);
 
-    const supabase = createClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('experiences') as any)
-      .update({ is_deleted: true, deleted_at: new Date().toISOString(), status: 'deleted' })
-      .eq('id', deleteModal.experience.id)
-      .eq('user_id', userId);
-
-    if (error) {
-      toast.error('Failed to delete: ' + error.message);
-    } else {
-      setExperiences((prev) => prev.filter((e) => e.id !== deleteModal.experience!.id));
-      toast.success('Surprise deleted successfully.');
-      setDeleteModal({ open: false, experience: null });
+    try {
+      const res = await fetch(`/api/experiences/${deleteModal.experience.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || 'Failed to delete. Please try again.');
+      } else {
+        setExperiences((prev) => prev.filter((e) => e.id !== deleteModal.experience!.id));
+        toast.success('Surprise deleted successfully.');
+        setDeleteModal({ open: false, experience: null });
+      }
+    } catch {
+      toast.error('Network error. Please try again.');
+    } finally {
+      setIsDeleting(false);
     }
-    setIsDeleting(false);
   };
 
   const handleArchive = async (experience: Experience) => {
