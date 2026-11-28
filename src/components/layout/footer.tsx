@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Heart, Mail } from 'lucide-react';
 import { ROUTES, APP_NAME } from '@/lib/constants';
 
@@ -29,11 +30,18 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <Link href={ROUTES.HOME} className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#B85C75] to-[#D9A86C] flex items-center justify-center">
-                <Heart className="w-5 h-5 text-white fill-white" />
-              </div>
-              <span className="font-serif text-2xl font-semibold">iLoveShare</span>
+            <Link
+              href={ROUTES.HOME}
+              className="inline-flex items-center bg-white/95 rounded-2xl px-4 py-2 shadow-soft mb-4 hover:bg-white transition-colors"
+              aria-label="iLoveShare Home"
+            >
+              <Image
+                src="/logo.png"
+                alt="iLoveShare"
+                width={100}
+                height={64}
+                className="h-12 w-auto object-contain"
+              />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-6 max-w-xs">
               Every feeling deserves a beautiful way to be shared. Create unforgettable digital celebrations for the people who matter most.

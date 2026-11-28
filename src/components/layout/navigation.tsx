@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Heart, Sparkles } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/constants';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -41,16 +42,15 @@ export function Navigation() {
       <div className="container-custom">
         <nav className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href={ROUTES.HOME} className="flex items-center gap-2 group">
-            <div className="relative">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#B85C75] to-[#D9A86C] flex items-center justify-center shadow-soft group-hover:shadow-medium transition-shadow duration-300">
-                <Heart className="w-5 h-5 text-white fill-white" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#D9A86C] animate-pulse-soft" />
-            </div>
-            <span className="font-serif text-xl font-semibold text-gradient">
-              iLoveShare
-            </span>
+          <Link href={ROUTES.HOME} className="flex items-center group" aria-label="iLoveShare Home">
+            <Image
+              src="/logo.png"
+              alt="iLoveShare"
+              width={94}
+              height={60}
+              priority
+              className="h-11 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-[1.03] dark:bg-white/95 dark:rounded-xl dark:px-2.5 dark:py-1"
+            />
           </Link>
 
           {/* Desktop nav links */}
@@ -157,13 +157,15 @@ export function DashboardNavigation({ user }: { user: { email?: string; full_nam
   return (
     <header className="fixed top-0 left-0 right-0 z-50 glass border-b border-brand-border">
       <div className="flex items-center justify-between h-16 px-4 md:px-6">
-        <Link href={ROUTES.HOME} className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#B85C75] to-[#D9A86C] flex items-center justify-center">
-            <Heart className="w-4 h-4 text-white fill-white" />
-          </div>
-          <span className="font-serif text-lg font-semibold text-gradient">
-            iLoveShare
-          </span>
+        <Link href={ROUTES.HOME} className="flex items-center group" aria-label="iLoveShare Home">
+          <Image
+            src="/logo.png"
+            alt="iLoveShare"
+            width={78}
+            height={50}
+            priority
+            className="h-10 w-auto object-contain dark:bg-white/95 dark:rounded-lg dark:px-2 dark:py-0.5"
+          />
         </Link>
 
         <div className="flex items-center gap-3">

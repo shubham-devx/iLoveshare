@@ -63,7 +63,7 @@ export default function TermsPage() {
 
               <section>
                 <h2 className="font-serif text-xl font-bold text-brand-text mb-2">8. Contact</h2>
-                <p>Questions about these terms? Contact us at <a href="mailto:legal@iloveshare.com" className="text-brand-primary hover:underline">legal@iloveshare.com</a>.</p>
+                <p>Questions about these terms? Contact us at <a href="mailto:mhn.technical.help7@gmail.com" className="text-brand-primary hover:underline">mhn.technical.help7@gmail.com</a>.</p>
               </section>
             </div>
           </div>

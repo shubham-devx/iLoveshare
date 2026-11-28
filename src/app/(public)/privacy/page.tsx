@@ -59,12 +59,12 @@ export default function PrivacyPage() {
 
               <section>
                 <h2 className="font-serif text-xl font-bold text-brand-text mb-2">7. Your Rights</h2>
-                <p>You have the right to access, correct, or delete your personal data. Contact us at <a href="mailto:privacy@iloveshare.com" className="text-brand-primary hover:underline">privacy@iloveshare.com</a> to exercise these rights.</p>
+                <p>You have the right to access, correct, or delete your personal data. Contact us at <a href="mailto:mhn.technical.help7@gmail.com" className="text-brand-primary hover:underline">mhn.technical.help7@gmail.com</a> to exercise these rights.</p>
               </section>
 
               <section>
                 <h2 className="font-serif text-xl font-bold text-brand-text mb-2">8. Contact Us</h2>
-                <p>If you have questions about this Privacy Policy, please contact us at <a href="mailto:privacy@iloveshare.com" className="text-brand-primary hover:underline">privacy@iloveshare.com</a>.</p>
+                <p>If you have questions about this Privacy Policy, please contact us at <a href="mailto:mhn.technical.help7@gmail.com" className="text-brand-primary hover:underline">mhn.technical.help7@gmail.com</a>.</p>
               </section>
             </div>
           </div>

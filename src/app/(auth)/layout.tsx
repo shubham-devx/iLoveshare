@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
+import Image from 'next/image';
 import { ROUTES } from '@/lib/constants';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -27,11 +27,19 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         ))}
 
         <div className="relative z-10 flex flex-col justify-center px-12 text-white">
-          <Link href={ROUTES.HOME} className="flex items-center gap-3 mb-12">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center">
-              <Heart className="w-6 h-6 fill-white" />
-            </div>
-            <span className="font-serif text-2xl font-bold">iLoveShare</span>
+          <Link
+            href={ROUTES.HOME}
+            className="inline-flex items-center bg-white/95 rounded-2xl px-4 py-2.5 shadow-medium mb-10 w-fit hover:bg-white transition-colors"
+            aria-label="iLoveShare Home"
+          >
+            <Image
+              src="/logo.png"
+              alt="iLoveShare"
+              width={106}
+              height={68}
+              priority
+              className="h-12 w-auto object-contain"
+            />
           </Link>
 
           <h2 className="font-serif text-4xl font-bold mb-4 leading-tight">
@@ -62,11 +70,15 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16">
         {/* Mobile logo */}
         <div className="lg:hidden mb-8">
-          <Link href={ROUTES.HOME} className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-primary to-brand-accent flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white fill-white" />
-            </div>
-            <span className="font-serif text-xl font-semibold text-gradient">iLoveShare</span>
+          <Link href={ROUTES.HOME} className="inline-flex items-center" aria-label="iLoveShare Home">
+            <Image
+              src="/logo.png"
+              alt="iLoveShare"
+              width={88}
+              height={56}
+              priority
+              className="h-12 w-auto object-contain dark:bg-white/95 dark:rounded-xl dark:px-2.5 dark:py-1"
+            />
           </Link>
         </div>
 
