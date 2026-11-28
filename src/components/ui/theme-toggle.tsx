@@ -1,9 +1,9 @@
 'use client';
 
-import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
 import { useSyncExternalStore } from 'react';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/components/providers/theme-provider';
 
 const emptySubscribe = () => () => {};
 
